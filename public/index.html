@@ -90,6 +90,9 @@
     </div>
   </div>
 
+  <!-- サイドバーの背後をクリックで閉じるオーバーレイ（モバイル用） -->
+  <div id="sidebar-overlay"></div>
+
   <!-- ── 右チャットエリア ── -->
   <div id="chat-area">
 
@@ -104,6 +107,8 @@
 
       <!-- ヘッダー -->
       <div id="chat-header">
+        <!-- モバイル時にサイドバーを開くハンバーガーボタン -->
+        <button id="sidebar-toggle" title="メニュー">☰</button>
         <span class="hash">#</span>
         <h3 id="room-title">general</h3>
         <span class="room-desc" id="online-count"></span>

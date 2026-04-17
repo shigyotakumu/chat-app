@@ -616,3 +616,60 @@ document.addEventListener('visibilitychange', () => {
     socket.emit('mark_read', currentDmId);
   }
 });
+
+// ============================================================
+// モバイル: サイドバードロワー開閉
+// ============================================================
+const sidebarEl      = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+const sidebarToggle  = document.getElementById('sidebar-toggle');
+
+function openSidebar() {
+  sidebarEl.classList.add('open');
+  sidebarOverlay.classList.add('open');
+}
+
+function closeSidebar() {
+  sidebarEl.classList.remove('open');
+  sidebarOverlay.classList.remove('open');
+}
+
+// ハンバーガーボタンでトグル
+sidebarToggle.addEventListener('click', () => {
+  sidebarEl.classList.contains('open') ? closeSidebar() : openSidebar();
+});
+
+// オーバーレイクリックで閉じる
+sidebarOverlay.addEventListener('click', closeSidebar);
+
+// チャンネルまたはDMを選んだらサイドバーを閉じる（モバイルのみ）
+function closeSidebarOnMobile() {
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
+// チャンネル・DM選択時にサイドバーを自動で閉じる（モバイルのみ）
+// room-list / dm-list の click イベントをキャプチャ
+document.getElementById('room-list').addEventListener('click', closeSidebarOnMobile);
+document.getElementById('dm-list').addEventListener('click', closeSidebarOnMobile);
+
+// ============================================================
+// モバイル: キーボード表示時の画面ズレ対策
+// Visual Viewport API でキーボード高さを取得してlayoutを調整
+// ============================================================
+if (window.visualViewport) {
+  let prevHeight = window.visualViewport.height;
+
+  window.visualViewport.addEventListener('resize', () => {
+    const currentHeight = window.visualViewport.height;
+    const app = document.getElementById('app');
+
+    // キーボードが開いた / 閉じた
+    app.style.height = currentHeight + 'px';
+
+    // キーボードが開いたとき(高さが縮んだとき)メッセージを一番下に
+    if (currentHeight < prevHeight) {
+      setTimeout(scrollToBottom, 50);
+    }
+    prevHeight = currentHeight;
+  });
+}
