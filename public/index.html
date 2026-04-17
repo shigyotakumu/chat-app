@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チャット</title>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+<!-- ============================================================
+     認証画面: ログイン / 新規登録
+     ============================================================ -->
+<div id="auth-screen">
+  <h1>💬 チャット</h1>
+
+  <!-- タブ -->
+  <div class="auth-tabs">
+    <button class="auth-tab active" data-form="login-form">ログイン</button>
+    <button class="auth-tab"        data-form="register-form">新規登録</button>
+  </div>
+
+  <!-- ログインフォーム -->
+  <div class="auth-form" id="login-form">
+    <div class="input-group">
+      <label for="login-username">ユーザー名</label>
+      <input type="text" id="login-username" placeholder="例: たろう" maxlength="20" autofocus>
+    </div>
+    <div class="input-group">
+      <label for="login-password">パスワード</label>
+      <input type="password" id="login-password" placeholder="パスワード">
+    </div>
+    <button id="login-btn">ログイン</button>
+  </div>
+
+  <!-- 登録フォーム -->
+  <div class="auth-form hidden" id="register-form">
+    <div class="input-group">
+      <label for="reg-username">ユーザー名（20文字以内）</label>
+      <input type="text" id="reg-username" placeholder="例: たろう" maxlength="20">
+    </div>
+    <div class="input-group">
+      <label for="reg-password">パスワード（4文字以上）</label>
+      <input type="password" id="reg-password" placeholder="パスワード">
+    </div>
+    <div class="input-group">
+      <label for="reg-confirm">パスワード（確認）</label>
+      <input type="password" id="reg-confirm" placeholder="もう一度入力">
+    </div>
+    <button id="register-btn">アカウントを作成</button>
+  </div>
+
+  <p class="auth-error" id="auth-error"></p>
+</div>
+
+<!-- ============================================================
+     アプリ本体
+     ============================================================ -->
+<div id="app">
+
+  <!-- ── 左サイドバー ── -->
+  <div id="sidebar">
+    <!-- アプリ名 -->
+    <div class="sidebar-header">
+      <h2>チャット</h2>
+    </div>
+
+    <!-- 自分のプロフィール（クリックでモーダル） -->
+    <div class="my-profile" id="my-profile-btn">
+      <div id="my-profile-avatar"></div>
+      <div>
+        <div class="my-name" id="my-profile-name"></div>
+        <div class="my-status">オンライン</div>
+      </div>
+    </div>
+
+    <!-- チャンネル一覧 -->
+    <div class="section-label">チャンネル</div>
+    <div id="room-list"></div>
+
+    <!-- DM 一覧 -->
+    <div class="section-label">ダイレクトメッセージ</div>
+    <div id="dm-list"></div>
+
+    <!-- オンラインユーザー一覧 -->
+    <div id="users-panel">
+      <div class="users-label">オンライン</div>
+      <div id="user-list"></div>
+    </div>
+  </div>
+
+  <!-- ── 右チャットエリア ── -->
+  <div id="chat-area">
+
+    <!-- チャンネル未選択時 -->
+    <div class="empty-state" id="empty-state">
+      <div class="icon">💬</div>
+      <p>左のチャンネルを選んで話しかけよう</p>
+    </div>
+
+    <!-- チャット本体 -->
+    <div id="chat-main" style="display:none; flex:1; flex-direction:column; min-height:0;">
+
+      <!-- ヘッダー -->
+      <div id="chat-header">
+        <span class="hash">#</span>
+        <h3 id="room-title">general</h3>
+        <span class="room-desc" id="online-count"></span>
+      </div>
+
+      <!-- メッセージ一覧 -->
+      <div id="messages"></div>
+
+      <!-- タイピングインジケーター -->
+      <div id="typing-indicator"></div>
+
+      <!-- 入力エリア -->
+      <div id="input-area">
+        <!-- 画像プレビュー -->
+        <div id="image-preview-area">
+          <img id="image-preview-thumb" src="" alt="preview">
+          <button id="image-cancel-btn" title="キャンセル">✕</button>
+        </div>
+
+        <!-- 入力行 -->
+        <div class="input-row">
+          <button id="image-btn" title="画像を送る">🖼</button>
+          <input type="file" id="image-file-input" accept="image/*" style="display:none">
+          <textarea id="msg-input" rows="1" placeholder="メッセージを入力..."></textarea>
+          <button id="send-btn" title="送信">➤</button>
+        </div>
+        <div class="hint">Enter で送信 / Shift+Enter で改行 / 画像をペースト可</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ライトボックス -->
+<div id="lightbox"><img id="lightbox-img" src="" alt=""></div>
+
+<!-- プロフィールモーダル -->
+<div class="modal-overlay" id="profile-modal">
+  <div class="modal">
+    <h2>プロフィール編集</h2>
+
+    <div class="avatar-upload-area">
+      <div id="profile-avatar-preview"></div>
+      <div>
+        <button class="avatar-upload-btn" id="avatar-file-btn">アイコンを変更</button>
+        <input type="file" id="avatar-file-input" accept="image/*" style="display:none">
+        <p style="font-size:.75rem; color:var(--text2); margin-top:6px;">1MB以下の画像</p>
+      </div>
+    </div>
+
+    <button class="modal-close" id="profile-modal-close">閉じる</button>
+  </div>
+</div>
+
+<!-- トースト通知コンテナ -->
+<div id="toast-container"></div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
