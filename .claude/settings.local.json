@@ -5,7 +5,9 @@
       "Bash(curl -s http://localhost:3000/api/register -H \"Content-Type: application/json\" -d '{\"username\":\"テスト\",\"password\":\"test1234\"}')",
       "Bash(curl *)",
       "Bash(mkdir -p C:/Github/app-projects/quiz-app)",
-      "Read(//c/Github/app-projects/**)"
+      "Read(//c/Github/app-projects/**)",
+      "Bash(pkill -f \"node server.js\")",
+      "Bash(gh auth *)"
     ]
   }
 }

@@ -174,8 +174,8 @@ document.getElementById('avatar-file-btn').addEventListener('click', () => {
 document.getElementById('avatar-file-input').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  if (file.size > 1 * 1024 * 1024) {
-    alert('画像は1MB以下にしてください');
+  if (file.size > 5 * 1024 * 1024) {
+    alert('画像は5MB以下にしてください');
     return;
   }
 
@@ -296,6 +296,7 @@ function openDm(targetSocketId, targetUsername) {
     document.getElementById('empty-state').style.display = 'none';
     const chatMain = document.getElementById('chat-main');
     chatMain.style.display = 'flex';
+    document.getElementById('app').classList.add('chat-open');
 
     document.getElementById('room-title').textContent = res.targetUsername || targetUsername;
     document.getElementById('chat-header').querySelector('.hash').innerHTML =
@@ -336,6 +337,7 @@ function joinRoom(id, name) {
 
     document.getElementById('empty-state').style.display = 'none';
     document.getElementById('chat-main').style.display   = 'flex';
+    document.getElementById('app').classList.add('chat-open');
 
     document.getElementById('room-title').textContent = name;
     updateUsers(res.users);
@@ -494,7 +496,7 @@ let pendingImage = null;
 
 function loadImageFile(file) {
   if (!file || !file.type.startsWith('image/')) return;
-  if (file.size > 2 * 1024 * 1024) { alert('画像は2MB以下にしてください'); return; }
+  if (file.size > 5 * 1024 * 1024) { alert('画像は2MB以下にしてください'); return; }
   const reader = new FileReader();
   reader.onload = e => {
     pendingImage = e.target.result;
@@ -618,58 +620,21 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // ============================================================
-// モバイル: サイドバードロワー開閉
+// モバイル：戻るボタン（サイドバーに戻る）
 // ============================================================
-const sidebarEl      = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebar-overlay');
-const sidebarToggle  = document.getElementById('sidebar-toggle');
-
-function openSidebar() {
-  sidebarEl.classList.add('open');
-  sidebarOverlay.classList.add('open');
-}
-
-function closeSidebar() {
-  sidebarEl.classList.remove('open');
-  sidebarOverlay.classList.remove('open');
-}
-
-// ハンバーガーボタンでトグル
-sidebarToggle.addEventListener('click', () => {
-  sidebarEl.classList.contains('open') ? closeSidebar() : openSidebar();
+document.getElementById('back-btn').addEventListener('click', () => {
+  document.getElementById('app').classList.remove('chat-open');
 });
-
-// オーバーレイクリックで閉じる
-sidebarOverlay.addEventListener('click', closeSidebar);
-
-// チャンネルまたはDMを選んだらサイドバーを閉じる（モバイルのみ）
-function closeSidebarOnMobile() {
-  if (window.innerWidth <= 768) closeSidebar();
-}
-
-// チャンネル・DM選択時にサイドバーを自動で閉じる（モバイルのみ）
-// room-list / dm-list の click イベントをキャプチャ
-document.getElementById('room-list').addEventListener('click', closeSidebarOnMobile);
-document.getElementById('dm-list').addEventListener('click', closeSidebarOnMobile);
 
 // ============================================================
 // モバイル: キーボード表示時の画面ズレ対策
-// Visual Viewport API でキーボード高さを取得してlayoutを調整
 // ============================================================
 if (window.visualViewport) {
   let prevHeight = window.visualViewport.height;
-
   window.visualViewport.addEventListener('resize', () => {
-    const currentHeight = window.visualViewport.height;
-    const app = document.getElementById('app');
-
-    // キーボードが開いた / 閉じた
-    app.style.height = currentHeight + 'px';
-
-    // キーボードが開いたとき(高さが縮んだとき)メッセージを一番下に
-    if (currentHeight < prevHeight) {
-      setTimeout(scrollToBottom, 50);
-    }
-    prevHeight = currentHeight;
+    const h = window.visualViewport.height;
+    document.getElementById('app').style.height = h + 'px';
+    if (h < prevHeight) setTimeout(scrollToBottom, 50);
+    prevHeight = h;
   });
 }

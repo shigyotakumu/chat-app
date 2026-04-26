@@ -19,9 +19,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg);
   color: var(--text);
-  /* dvh = キーボード表示時も正しい画面高さを取得 */
+  height: 100vh;
   height: 100dvh;
-  height: 100vh; /* dvh未対応ブラウザ向けフォールバック */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,8 +117,8 @@ button:disabled { opacity: .4; cursor: not-allowed; }
 /* ── アプリ本体 ─────────────────────────────────────────────── */
 #app {
   display: none;
-  height: 100dvh;
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   max-width: 1200px;
   margin: 0 auto;
@@ -608,113 +607,65 @@ button:disabled { opacity: .4; cursor: not-allowed; }
   to { transform: translateX(110%); opacity: 0; }
 }
 
-/* ── ハンバーガーボタン（モバイルのみ表示） ──────────────────── */
-#sidebar-toggle {
-  display: none;
-  background: transparent;
-  border: none;
-  color: var(--text2);
-  font-size: 1.3rem;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  cursor: pointer;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  transition: background .15s;
-}
-#sidebar-toggle:hover { background: var(--surface2); }
-
-/* サイドバー背景オーバーレイ（モバイルでドロワーを閉じるため） */
-#sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, .55);
-  z-index: 50;
-}
-#sidebar-overlay.open { display: block; }
-
-/* ── レスポンシブ（スマホ：768px以下） ──────────────────────── */
-@media (max-width: 768px) {
-
-  /* キーボード表示時に画面全体がズレないようにする */
+/* ── レスポンシブ（モバイル） ────────────────────────────────── */
+@media (max-width: 680px) {
+  /* キーボード表示時にレイアウトが崩れないよう固定 */
   body, #app {
-    height: 100%;
     position: fixed;
     width: 100%;
-    top: 0; left: 0;
-  }
-
-  /* サイドバーを画面外に隠し、スライドドロワーにする */
-  #sidebar {
-    position: fixed;
     top: 0;
-    left: -280px;       /* 初期状態は画面外に隠す */
-    width: 280px;
-    min-width: 280px;
-    height: 100%;
-    z-index: 100;
-    transition: left .25s ease;
-    overflow-y: auto;
-  }
-
-  /* .open クラスが付いたらスライドイン */
-  #sidebar.open {
     left: 0;
+    height: 100%;
   }
 
-  /* チャットエリアを全幅に */
+  /* サイドバーと チャットエリアを重ねて片方ずつ表示 */
+  #app.visible {
+    position: fixed;
+  }
+
+  #sidebar {
+    width: 100%;
+    min-width: unset;
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    border-right: none;
+  }
+
   #chat-area {
     width: 100%;
-    flex: 1;
   }
 
-  /* ハンバーガーボタンを表示 */
-  #sidebar-toggle {
+  /* チャット画面を表示中はサイドバーを隠す */
+  #app.visible.chat-open #sidebar {
+    display: none;
+  }
+
+  /* 戻るボタン（モバイルのみ表示） */
+  #back-btn {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    color: var(--accent2);
+    font-size: 1.2rem;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+    width: auto;
   }
+  #back-btn:hover { opacity: .7; }
 
-  /* ヘッダーのタイトルが長くて溢れないように */
-  #chat-header h3 {
-    font-size: .9rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: calc(100vw - 180px);
-  }
+  /* モーダルの幅調整 */
+  .modal { width: 90vw; }
 
-  /* 入力エリアのパディングをスマホ向けに調整 */
-  #input-area {
-    padding: 8px 12px 12px;
-  }
+  /* トーストの幅調整 */
+  .toast { min-width: unset; max-width: calc(100vw - 32px); }
+}
 
-  /* メッセージ一覧の余白を縮小 */
-  #messages {
-    padding: 12px;
-  }
-
-  /* 画像の最大幅をスマホ幅に合わせる */
-  .msg-image {
-    max-width: 100%;
-  }
-
-  /* プロフィールモーダルをスマホ幅に */
-  .modal {
-    width: calc(100vw - 32px);
-    margin: 0 16px;
-  }
-
-  /* トーストを左右いっぱいに */
-  #toast-container {
-    left: 12px;
-    right: 12px;
-  }
-  .toast {
-    min-width: unset;
-    max-width: unset;
-    width: 100%;
-  }
+@media (min-width: 681px) {
+  #back-btn { display: none; }
 }
